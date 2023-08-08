@@ -67,7 +67,9 @@ if (chip_enable_wifi) {
         "${chip_root}/third_party/silabs/wiseconnect-wifi-bt-sdk"
     import("rs911x/rs911x.gni")
   } else if (use_SiWx917) {
-    wisemcu_sdk_root = "${chip_root}/third_party/silabs/wisemcu-wifi-bt-sdk"
+#    wisemcu_sdk_root = "${chip_root}/third_party/silabs/wisemcu-wifi-bt-sdk"
+
+    wifi_sdk_root = "${chip_root}/third_party/silabs/wifi_sdk"
     import("rs911x/rs9117.gni")
   }
   if (use_wf200) {
