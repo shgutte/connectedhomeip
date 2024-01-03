@@ -123,7 +123,7 @@ typedef struct __attribute__((__packed__)) sl_wfx_mib_req_s
 #include "lwip/tcpip.h"
 
 // SLC-FIX
-#include "sl_matter_wifi_config.h"
+//#include "sl_matter_wifi_config.h"
 /* Wi-Fi bitmask events - for the task */
 #define SL_WFX_CONNECT (1 << 1)
 #define SL_WFX_DISCONNECT (1 << 2)

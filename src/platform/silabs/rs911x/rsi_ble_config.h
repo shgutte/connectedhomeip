@@ -27,7 +27,7 @@
 #endif
 
 // SLC-FIX
-#include "sl_matter_wifi_config.h"
+//#include "sl_matter_wifi_config.h"
 /******************************************************
  * *                      Macros
  * ******************************************************/
