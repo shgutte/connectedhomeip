@@ -130,6 +130,7 @@ template("efr32_sdk") {
     # Treat these includes as system includes, so warnings in them are not fatal.
     _include_dirs = [
       "${efr32_sdk_root}",
+      "${examples_plat_dir}",
       "${efr32_sdk_root}/util/plugin/security_manager/",
       "${efr32_sdk_root}/hardware/kit/common/bsp",
       "${efr32_sdk_root}/hardware/board/inc",
@@ -342,6 +343,10 @@ template("efr32_sdk") {
           "EXP_BOARD=1",
           "CHIP_917",
           "SLI_SI917=1",
+          "SL_WFX_CONFIG_SCAN=1",
+          "SL_POWER_MANAGER_LOWEST_EM_ALLOWED=1",
+          "SL_POWER_MANAGER_CONFIG_VOLTAGE_SCALING_FAST_WAKEUP=1",
+          "SL_PSA_KEY_USER_SLOT_COUNT=21",
           "CHIP_9117",
           "SL_WIFI_COMPONENT_INCLUDED",
         ]
@@ -350,6 +355,8 @@ template("efr32_sdk") {
           "SL_HEAP_SIZE=24576",
           "WF200_WIFI=1",
           "SL_WIFI=1",
+          "CHIP_DEVICE_CONFIG_ENABLE_IPV4=1",
+          "WIFI_ENABLE_SECURITY_WPA3_TRANSITION=1",
           "SL_WFX_USE_SPI",
           "SL_WFX_DEBUG_MASK=0x0003",
         ]
@@ -655,7 +662,7 @@ template("efr32_sdk") {
       "${efr32_sdk_root}/platform/service/iostream/src/sl_iostream.c",
       "${efr32_sdk_root}/platform/service/iostream/src/sl_iostream_rtt.c",
       "${efr32_sdk_root}/platform/service/mpu/src/sl_mpu.c",
-      "${efr32_sdk_root}/platform/service/power_manager/src/sl_power_manager.c",
+      #"${efr32_sdk_root}/platform/service/power_manager/src/sl_power_manager.c",
       "${efr32_sdk_root}/platform/service/power_manager/src/sl_power_manager_debug.c",
       "${efr32_sdk_root}/platform/service/power_manager/src/sl_power_manager_hal_s0_s1.c",
       "${efr32_sdk_root}/platform/service/power_manager/src/sl_power_manager_hal_s2.c",
@@ -672,7 +679,7 @@ template("efr32_sdk") {
       "${efr32_sdk_root}/util/third_party/freertos/kernel/croutine.c",
       "${efr32_sdk_root}/util/third_party/freertos/kernel/event_groups.c",
       "${efr32_sdk_root}/util/third_party/freertos/kernel/list.c",
-      "${efr32_sdk_root}/util/third_party/freertos/kernel/portable/SiliconLabs/tick_power_manager.c",
+      #"${efr32_sdk_root}/util/third_party/freertos/kernel/portable/SiliconLabs/tick_power_manager.c",
       "${efr32_sdk_root}/util/third_party/freertos/kernel/queue.c",
       "${efr32_sdk_root}/util/third_party/freertos/kernel/stream_buffer.c",
       "${efr32_sdk_root}/util/third_party/freertos/kernel/tasks.c",
