@@ -80,6 +80,16 @@ void OTADataAccumulator::Init(uint32_t threshold)
     mThreshold    = threshold;
     mBufferOffset = 0;
     mBuffer.Alloc(mThreshold);
+
+#ifdef USE_MBEDTLS  
+    uint8_t temp[16] = { 0 };
+    MutableByteSpan key(temp, sizeof(temp));
+    size_t size    = 0;
+    CHIP_ERROR err = (Flash::Get(Parameters::ID::kOtaTlvEncryptionKey, key.data(), key.size(), size));
+    ReturnErrorOnFailure(err);
+    key.reduce_size(size);
+    OtaTlvEncryptionKey key = OtaTlvEncryptionKey(key.data(), key.size());
+#endif
 }
 
 void OTADataAccumulator::Clear()
@@ -107,12 +117,18 @@ CHIP_ERROR OTADataAccumulator::Accumulate(ByteSpan & block)
 #ifdef SL_MATTER_ENABLE_OTA_ENCRYPTION
 CHIP_ERROR OTATlvProcessor::vOtaProcessInternalEncryption(MutableByteSpan & block)
 {
-    uint32_t keyId;
-    SilabsConfig::ReadConfigValue(SilabsConfig::kOtaTlvEncryption_KeyId, keyId);
-    chip::DeviceLayer::Silabs::OtaTlvEncryptionKey::OtaTlvEncryptionKey key(keyId);
-    key.Decrypt(block, mIVOffset);
 
-    return CHIP_NO_ERROR;
+#ifdef USE_MBEDTLS
+key.Decrypt(block, mIVOffset);
+
+return CHIP_NO_ERROR;
+#else
+uint32_t keyId;
+SilabsConfig::ReadConfigValue(SilabsConfig::kOtaTlvEncryption_KeyId, keyId);
+chip::DeviceLayer::Silabs::OtaTlvEncryptionKey::OtaTlvEncryptionKey key(keyId);
+key.Decrypt(block, mIVOffset);
+return CHIP_NO_ERROR;
+#endif
 }
 #endif
 } // namespace chip
