@@ -726,7 +726,7 @@ CHIP_ERROR Storage::GetProvisionRequest(bool & value)
 #ifdef SL_MATTER_ENABLE_OTA_ENCRYPTION
 CHIP_ERROR Storage::SetOtaTlvEncryptionKey(const ByteSpan & value)
 {
-    return CHIP_ERROR_NOT_IMPLEMENTED;
+    return Flash::Set(Parameters::ID::kOtaTlvEncryptionKey, value.data(), value.size());
 }
 #endif // SL_MATTER_ENABLE_OTA_ENCRYPTION
 
