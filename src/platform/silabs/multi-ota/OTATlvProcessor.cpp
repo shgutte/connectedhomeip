@@ -26,11 +26,12 @@
 #include <platform/silabs/SilabsConfig.h>
 #include <platform/silabs/multi-ota/OtaTlvEncryptionKey.h>
 #include <headers/ProvisionStorage.h>
+using namespace ::chip::DeviceLayer::Silabs::OtaTlvEncryptionKey;
+using namespace ::chip::DeviceLayer::Silabs::Provision;
+using namespace ::chip::DeviceLayer::Silabs::Provision::Flash;
 #endif
 
 using namespace ::chip::DeviceLayer::Internal;
-using namespace ::chip::DeviceLayer::Silabs::OtaTlvEncryptionKey;
-using namespace ::chip::DeviceLayer::Silabs::Provision;
 
 namespace chip {
 
@@ -61,17 +62,6 @@ CHIP_ERROR OTATlvProcessor::Process(ByteSpan & block)
         }
     }
     return status;
-}
-
-CHIP_ERROR OTATlvProcessor::Init()
-{
-    VerifyOrReturnError(mCallbackProcessDescriptor != nullptr, CHIP_OTA_PROCESSOR_CB_NOT_REGISTERED);
-    mAccumulator.Init(sizeof(Descriptor));
-#if SL_MATTER_ENABLE_OTA_ENCRYPTION
-    mUnalignmentNum = 0;
-#endif //SL_MATTER_ENABLE_OTA_ENCRYPTION
-
-    return CHIP_NO_ERROR;
 }
 
 void OTATlvProcessor::ClearInternal()
