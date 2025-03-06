@@ -18,25 +18,26 @@ class OtaTlvEncryptionKey
 {
 public:
     OtaTlvEncryptionKey(uint32_t id = 0) { mId = (id > 0) ? id : kAES_KeyId_Default; }
-    OtaTlvEncryptionKey(uint32_t id = 0, const uint8_t * key, size_t key_len) {
-        mId = (id > 0) ? id : kAES_KeyId_Default; 
-        this->key = key;
-        this->key_len = key_len;
+#ifdef SL_MBEDTLS_USE_TINYCRYPT
+OtaTlvEncryptionKey(const uint8_t * key, size_t key_len) {
+        mKey = key;
+        mKeyLen = key_len;
     }
-    ~OtaTlvEncryptionKey() = default;
+#endif // SL_MBEDTLS_USE_TINYCRYPT
+~OtaTlvEncryptionKey() = default;
 
     uint32_t GetId() { return mId; }
     CHIP_ERROR Import(const uint8_t * key, size_t key_len);
-#ifdef USE_MBDTLS
+#ifdef SL_MBEDTLS_USE_TINYCRYPT
     void UpdateIV(unsigned char *iv, uint32_t &mIVOffset);
-    CHIP_ERROR Decrypt(MutableByteSpan &block, uint32_t &mIVOffset);
-#else
+#endif // SL_MBEDTLS_USE_TINYCRYPT
     CHIP_ERROR Decrypt(MutableByteSpan & block, uint32_t & mIVOffset);
-#endif
 protected:
-    const uint8_t * key;
-    size_t key_len;
-    uint32_t mId = 0;
+uint32_t mId = 0;
+#ifdef SL_MBEDTLS_USE_TINYCRYPT
+    const uint8_t * mKey = nullptr;
+    size_t mKeyLen = 0;
+#endif // SL_MBEDTLS_USE_TINYCRYPT
 };
 
 } // namespace OtaTlvEncryptionKey

@@ -95,6 +95,8 @@ config("siwx917-common-config") {
     defines += [ "CHIP_DEVICE_CONFIG_ENABLE_MULTI_OTA_REQUESTOR=1" ]
   }
 
+  defines += [ "USE_MBEDTLS=1" ]
+
   ldflags = [ "-Wl,--no-warn-rwx-segment" ]
 }
 

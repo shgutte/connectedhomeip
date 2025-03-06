@@ -25,9 +25,12 @@
 #ifdef SL_MATTER_ENABLE_OTA_ENCRYPTION
 #include <platform/silabs/SilabsConfig.h>
 #include <platform/silabs/multi-ota/OtaTlvEncryptionKey.h>
+#include <headers/ProvisionStorage.h>
 #endif
 
 using namespace ::chip::DeviceLayer::Internal;
+using namespace ::chip::DeviceLayer::Silabs::OtaTlvEncryptionKey;
+using namespace ::chip::DeviceLayer::Silabs::Provision;
 
 namespace chip {
 
@@ -60,6 +63,17 @@ CHIP_ERROR OTATlvProcessor::Process(ByteSpan & block)
     return status;
 }
 
+CHIP_ERROR OTATlvProcessor::Init()
+{
+    VerifyOrReturnError(mCallbackProcessDescriptor != nullptr, CHIP_OTA_PROCESSOR_CB_NOT_REGISTERED);
+    mAccumulator.Init(sizeof(Descriptor));
+#if SL_MATTER_ENABLE_OTA_ENCRYPTION
+    mUnalignmentNum = 0;
+#endif //SL_MATTER_ENABLE_OTA_ENCRYPTION
+
+    return CHIP_NO_ERROR;
+}
+
 void OTATlvProcessor::ClearInternal()
 {
     mLength          = 0;
@@ -80,16 +94,6 @@ void OTADataAccumulator::Init(uint32_t threshold)
     mThreshold    = threshold;
     mBufferOffset = 0;
     mBuffer.Alloc(mThreshold);
-
-#ifdef USE_MBEDTLS  
-    uint8_t temp[16] = { 0 };
-    MutableByteSpan key(temp, sizeof(temp));
-    size_t size    = 0;
-    CHIP_ERROR err = (Flash::Get(Parameters::ID::kOtaTlvEncryptionKey, key.data(), key.size(), size));
-    ReturnErrorOnFailure(err);
-    key.reduce_size(size);
-    OtaTlvEncryptionKey key = OtaTlvEncryptionKey(key.data(), key.size());
-#endif
 }
 
 void OTADataAccumulator::Clear()
@@ -117,18 +121,23 @@ CHIP_ERROR OTADataAccumulator::Accumulate(ByteSpan & block)
 #ifdef SL_MATTER_ENABLE_OTA_ENCRYPTION
 CHIP_ERROR OTATlvProcessor::vOtaProcessInternalEncryption(MutableByteSpan & block)
 {
-
-#ifdef USE_MBEDTLS
-key.Decrypt(block, mIVOffset);
-
-return CHIP_NO_ERROR;
+#ifdef SL_MBEDTLS_USE_TINYCRYPT  
+    uint8_t temp[16] = { 0 };
+    MutableByteSpan key(temp, sizeof(temp));
+    size_t size    = 0;
+    CHIP_ERROR err = (Flash::Get(Parameters::ID::kOtaTlvEncryptionKey, key.data(), key.size(), size));
+    ReturnErrorOnFailure(err);
+    key.reduce_size(size);
+    OtaTlvEncryptionKey tlvKey = OtaTlvEncryptionKey(key.data(), key.size());
+    tlvKey.Decrypt(block, mIVOffset);
+    return CHIP_NO_ERROR;
 #else
 uint32_t keyId;
 SilabsConfig::ReadConfigValue(SilabsConfig::kOtaTlvEncryption_KeyId, keyId);
 chip::DeviceLayer::Silabs::OtaTlvEncryptionKey::OtaTlvEncryptionKey key(keyId);
 key.Decrypt(block, mIVOffset);
 return CHIP_NO_ERROR;
-#endif
+#endif // SL_MBEDTLS_USE_TINYCRYPT
 }
 #endif
 } // namespace chip

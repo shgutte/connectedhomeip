@@ -4,7 +4,7 @@
 #include <stdio.h>
 #include <string.h>
 
-#ifndef USE_MBDTLS
+#ifndef SL_MBEDTLS_USE_TINYCRYPT
 #include <sl_psa_crypto.h>
 #else
 #include "mbedtls/cipher.h"
@@ -17,13 +17,9 @@ namespace DeviceLayer {
 namespace Silabs {
 namespace OtaTlvEncryptionKey {
 
-uint8_t sValue[128] = { 0 };
-size_t sSize = 0;
-uint8_t mKey[16]; // Add a member variable to store the key
-
 using SilabsConfig = chip::DeviceLayer::Internal::SilabsConfig;
 
-#ifdef USE_MBDTLS
+#ifdef SL_MBEDTLS_USE_TINYCRYPT
 void UpdateIV(unsigned char *iv, uint32_t &mIVOffset)
 {
     // Combine the last four bytes of the IV into a single 32-bit integer
@@ -42,7 +38,7 @@ void UpdateIV(unsigned char *iv, uint32_t &mIVOffset)
     iv[15] = static_cast<uint8_t>(u32IVCount & 0xff);
 }
 
-CHIP_ERROR Decrypt(MutableByteSpan &block, uint32_t &mIVOffset)
+CHIP_ERROR OtaTlvEncryptionKey::Decrypt(MutableByteSpan &block, uint32_t &mIVOffset)
 {
     unsigned char *input = block.data();
     size_t input_len = block.size();
@@ -57,7 +53,7 @@ CHIP_ERROR Decrypt(MutableByteSpan &block, uint32_t &mIVOffset)
     mbedtls_aes_init(&aes); // Initialize the AES context
 
     // Set the AES decryption key
-    if (mbedtls_aes_setkey_dec(&aes, key, 128U) != 0)
+    if (mbedtls_aes_setkey_dec(&aes, mKey, 128U) != 0)
     {
         mbedtls_aes_free(&aes);
         delete[] output; // Free allocated memory

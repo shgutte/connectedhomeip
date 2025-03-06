@@ -43,16 +43,6 @@ namespace chip {
 // Define static memebers
 bool OTAWiFiFirmwareProcessor::mReset = false;
 
-CHIP_ERROR OTAWiFiFirmwareProcessor::Init()
-{
-    VerifyOrReturnError(mCallbackProcessDescriptor != nullptr, CHIP_OTA_PROCESSOR_CB_NOT_REGISTERED);
-    mAccumulator.Init(sizeof(Descriptor));
-#if SL_MATTER_ENABLE_OTA_ENCRYPTION
-    mUnalignmentNum = 0;
-#endif //SL_MATTER_ENABLE_OTA_ENCRYPTION
-
-    return CHIP_NO_ERROR;
-}
 
 CHIP_ERROR OTAWiFiFirmwareProcessor::Clear()
 {

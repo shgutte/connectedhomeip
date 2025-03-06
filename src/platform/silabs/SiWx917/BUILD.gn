@@ -121,6 +121,7 @@ static_library("SiWx917") {
     public_deps += [
       "${chip_root}/src/crypto",
       "${silabs_platform_dir}/wifi:wifi-platform",
+      "${sl_provision_root}:headers",
     ]
   }
 }
