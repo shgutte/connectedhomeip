@@ -47,9 +47,9 @@ CHIP_ERROR OTAWiFiFirmwareProcessor::Init()
 {
     VerifyOrReturnError(mCallbackProcessDescriptor != nullptr, CHIP_OTA_PROCESSOR_CB_NOT_REGISTERED);
     mAccumulator.Init(sizeof(Descriptor));
-#if OTA_ENCRYPTION_ENABLE
+#if SL_MATTER_ENABLE_OTA_ENCRYPTION
     mUnalignmentNum = 0;
-#endif //OTA_ENCRYPTION_ENABLE
+#endif //SL_MATTER_ENABLE_OTA_ENCRYPTION
 
     return CHIP_NO_ERROR;
 }
@@ -59,9 +59,9 @@ CHIP_ERROR OTAWiFiFirmwareProcessor::Clear()
     OTATlvProcessor::ClearInternal();
     mAccumulator.Clear();
     mDescriptorProcessed = false;
-#if OTA_ENCRYPTION_ENABLE
+#if SL_MATTER_ENABLE_OTA_ENCRYPTION
     mUnalignmentNum = 0;
-#endif //OTA_ENCRYPTION_ENABLE
+#endif //SL_MATTER_ENABLE_OTA_ENCRYPTION
 
     return CHIP_NO_ERROR;
 }
@@ -78,13 +78,13 @@ CHIP_ERROR OTAWiFiFirmwareProcessor::ProcessInternal(ByteSpan & block)
     if (!mDescriptorProcessed)
     {
         ReturnErrorOnFailure(ProcessDescriptor(block));
-#if OTA_ENCRYPTION_ENABLE
+#if SL_MATTER_ENABLE_OTA_ENCRYPTION
         /* 16 bytes to used to store undecrypted data because of unalignment */
         mAccumulator.Init(requestedOtaMaxBlockSize + 16);
-#endif //OTA_ENCRYPTION_ENABLE
+#endif //SL_MATTER_ENABLE_OTA_ENCRYPTION
     }
 
-#if OTA_ENCRYPTION_ENABLE
+#if SL_MATTER_ENABLE_OTA_ENCRYPTION
     MutableByteSpan mBlock = MutableByteSpan(mAccumulator.data(), mAccumulator.GetThreshold());
     memcpy(&mBlock[0], &mBlock[requestedOtaMaxBlockSize], mUnalignmentNum);
     memcpy(&mBlock[mUnalignmentNum], block.data(), block.size());
@@ -105,7 +105,7 @@ CHIP_ERROR OTAWiFiFirmwareProcessor::ProcessInternal(ByteSpan & block)
 
     OTATlvProcessor::vOtaProcessInternalEncryption(mBlock);
     block = mBlock;
-#endif //OTA_ENCRYPTION_ENABLE
+#endif //SL_MATTER_ENABLE_OTA_ENCRYPTION
 
     if (flag == RPS_HEADER)
     {

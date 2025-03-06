@@ -180,6 +180,19 @@ template("siwx917_sdk") {
       ]
     }
 
+    if (chip_enable_multi_ota_requestor) {
+      if (chip_enable_multi_ota_encryption) {
+        defines += [
+          "OTA_ENCRYPTION_ENABLE=1",
+          "SL_MATTER_ENABLE_OTA_ENCRYPTION=1",
+        ]
+      }
+
+      if (chip_enable_ota_custom_tlv_testing) {
+        defines += [ "OTA_TEST_CUSTOM_TLVS=1" ]
+      }
+    }
+
     # Note that we're setting the mbedTLS and PSA configuration files through a
     # define. This means the build system by default does not pick up changes in
     # the content of these, only when changing the filename itself.
